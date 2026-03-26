@@ -1,6 +1,7 @@
 public class GameField{
     private int[][] field1;
     private int[][] field2;
+    private boolean flag = false;
 
     public GameField(int row, int col){
 
@@ -16,4 +17,11 @@ public class GameField{
         return field2;
     }
 
+    public boolean getFlag(){
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
 }

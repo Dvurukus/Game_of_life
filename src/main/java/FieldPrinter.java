@@ -1,9 +1,16 @@
 import java.lang.Math;
 
+import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
+import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.graphics.TextGraphics;
 
-public class FieldPrinter{
+import javax.swing.*;
+import java.io.IOException;
 
+public class FieldPrinter{
  
     public static void initField(int[][] field1){
         for(int i = 0; i < field1.length; i++){
@@ -18,29 +25,33 @@ public class FieldPrinter{
         }
     }
 
-    public static void printField(int[][] field){
-        for(int i = 0; i < field.length; i++){
-            for(int j = 0; j < field[i].length; j++){
-                System.out.print(field[i][j]);
-            }
-            System.out.println();
-        }
-    }
+    public static void updateField(int[][] field1, int[][] field2, Screen screen){
 
-    public static void updateField(int[][] field1, int[][] field2){
-        
         TextGraphics tg = screen.newTextGraphics();
 
         for(int i = 0; i < field1.length; i++){
             for(int j = 0; j < field1[i].length; j++){
                 field2[i][j] = desicion(countNeighbor(field1, i, j), field1[i][j]);
                 if(field2[i][j] == 1){
-                    tg.setCharacter(i, j, '@');
+                    double rand = Math.random() * 100;
+                    if(rand <= 50){
+                        tg.setBackgroundColor(TextColor.ANSI.MAGENTA_BRIGHT);
+                        tg.setCharacter(j, i, ' ');
+                    } else if (rand > 50 && rand <= 80){
+                        tg.setBackgroundColor(TextColor.ANSI.CYAN_BRIGHT);
+                        tg.setCharacter(j, i, ' ');
+                    } else if (rand == 99) {
+                        tg.setBackgroundColor(TextColor.ANSI.WHITE_BRIGHT);
+                        tg.setCharacter(j, i, ' ');
+                    } else if (rand > 93) {
+                        tg.setBackgroundColor(TextColor.ANSI.BLUE_BRIGHT);
+                        tg.setCharacter(j, i, ' ');
+                    }
                 } else {
-                    tg.setCharacter(i, j, '.');
+                    tg.setBackgroundColor(TextColor.ANSI.BLACK);
+                    tg.setCharacter(j, i, ' ');
                 }
             }
-            System.out.println();
         }
     }
 
@@ -72,13 +83,14 @@ public class FieldPrinter{
         int desicion = -1;
         if((neighbor == 2 || neighbor == 3)&& status == 1){
             desicion = 1;
-        } if (neighbor == 3 && status == 0) {
+        } else if (neighbor == 3 && status == 0) {
             desicion = 1;
         } else {
             desicion = 0;
         }
         return desicion;
     }
+
 
     public static void copyField(int[][] field2, int[][] field1){
         for(int i = 0; i < field1.length; i++){
@@ -87,4 +99,32 @@ public class FieldPrinter{
             }
         }
     }
+
+    public static int coutAllive(int[][] field1){
+        int count = 0;
+        for (int i = 0; i < field1.length; i++){
+            for (int j = 0; j < field1[i].length; j++){
+                count += field1[i][j];
+            }
+        }
+        return count;
+    }
+
+    public static int readKey(Screen screen, int milliSec, GameField game) throws IOException {
+        KeyStroke stroke = screen.pollInput();
+
+        if(stroke != null){
+            if(stroke.getKeyType() == KeyType.ArrowUp){
+                if(milliSec - 10 > 0){
+                    milliSec -= 10;
+                }
+            } else if (stroke.getKeyType() == KeyType.ArrowDown){
+                milliSec += 10;
+            } else if (stroke.getKeyType() == KeyType.Escape) {
+                game.setFlag(true);
+            }
+        }
+        return milliSec;
+    }
+
 }

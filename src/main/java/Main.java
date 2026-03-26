@@ -5,23 +5,33 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) {
         try {
-            // Инициализация Lanterna
+
             Screen screen = new DefaultTerminalFactory().createScreen();
             screen.startScreen();
 
-            GameField game = new GameField(40, 80);
+            GameField game = new GameField(70, 240);
             FieldPrinter.initField(game.getField1());
 
-            // Ваш цикл игры
-            for (int i = 0; i < 100; i++) {
-                
-                FieldPrinter.updateField(game.getField1(), game.getField2());
+            int milliSec = 201;
+
+
+            while (!game.getFlag()) {
+
+                milliSec = FieldPrinter.readKey(screen, milliSec, game);
+
+                FieldPrinter.updateField(game.getField1(), game.getField2(), screen);
 
                 screen.refresh();
                 
                 FieldPrinter.copyField(game.getField2(), game.getField1());
 
-                Thread.sleep(100);
+                Thread.sleep(milliSec);
+
+                screen.doResizeIfNecessary();
+                if (screen.doResizeIfNecessary() != null) {
+                    screen.clear();
+                }
+
             }
 
             screen.stopScreen();
